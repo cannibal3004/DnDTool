@@ -6,29 +6,28 @@
         static void Main(string[] args)
         {
             Menu menu = new Menu("DnD Tools");
-            MenuItem dice = menu.AddItem("Dice", null, null);
-            MenuItem d4 = menu.AddItem("Roll D4", dice, () => { RollDice(Die.D4); return true; });
-            MenuItem d6 = menu.AddItem("Roll D6", dice, () => { RollDice(Die.D6); return true; });
-            MenuItem d8 = menu.AddItem("Roll D8", dice, () => { RollDice(Die.D8); return true; });
-            MenuItem d10 = menu.AddItem("Roll D10", dice, () => { RollDice(Die.D10); return true; });
-            MenuItem d12 = menu.AddItem("Roll D12", dice, () => { RollDice(Die.D12); return true; });
-            MenuItem d20 = menu.AddItem("Roll D20", dice, () => { RollDice(Die.D20); return true; });
-            MenuItem d100 = menu.AddItem("Roll D100", dice, () => { RollDice(Die.D100); return true; });
-            MenuItem questions = menu.AddItem("Questions", null, () => { Question(); return true; });
-            MenuItem travel = menu.AddItem("Travel", null, null);
-            MenuItem travelOnFoot = menu.AddItem("On Foot", travel, () => { Travel(Mount.Foot); return true; });
-            MenuItem travelOnHorseBack = menu.AddItem("On horseback", travel, () => { Travel(Mount.Horse); return true; });
-            MenuItem travelOnDraftHorse = menu.AddItem("On draft horse", travel, () => { Travel(Mount.DraftHorse); return true; });
-            MenuItem travelOnWarHorse = menu.AddItem("On war horse", travel, () => { Travel(Mount.WarHorse); return true; });
-            MenuItem travelOnMule = menu.AddItem("On on mule", travel, () => { Travel(Mount.Mule); return true; });
-            MenuItem travelOnMastiff = menu.AddItem("On mastiff", travel, () => { Travel(Mount.Mastiff); return true; });
-            MenuItem camp = menu.AddItem("Camp", null, null);
-            MenuItem findCamp = menu.AddItem("Find Campsite", camp, null);
-            //MenuItem 
-            MenuItem encounters = menu.AddItem("Encounters", null, null);
-            MenuItem areaGenerators = menu.AddItem("Area Genrator", null, null);
-            MenuItem lootTables = menu.AddItem("Quest Generator", null, () => { GenerateQuest(); return true; });
-            MenuItem exit = menu.AddItem("Exit", null, () => { menu.Stop(); return true; });
+            Menu.MenuItem dice = menu.AddItem("Dice", null, null);
+            Menu.MenuItem d4 = menu.AddItem("Roll D4", dice, () => { RollDice(Die.D4); });
+            Menu.MenuItem d6 = menu.AddItem("Roll D6", dice, () => { RollDice(Die.D6); });
+            Menu.MenuItem d8 = menu.AddItem("Roll D8", dice, () => { RollDice(Die.D8); });
+            Menu.MenuItem d10 = menu.AddItem("Roll D10", dice, () => { RollDice(Die.D10); });
+            Menu.MenuItem d12 = menu.AddItem("Roll D12", dice, () => { RollDice(Die.D12);});
+            Menu.MenuItem d20 = menu.AddItem("Roll D20", dice, () => { RollDice(Die.D20); });
+            Menu.MenuItem d100 = menu.AddItem("Roll D100", dice, () => { RollDice(Die.D100); });
+            Menu.MenuItem questions = menu.AddItem("Questions", null, () => { Question(); });
+            Menu.MenuItem travel = menu.AddItem("Travel", null, null);
+            Menu.MenuItem travelOnFoot = menu.AddItem("On Foot", travel, () => { Travel(Mount.Foot); });
+            Menu.MenuItem travelOnHorseBack = menu.AddItem("On horseback", travel, () => { Travel(Mount.Horse); });
+            Menu.MenuItem travelOnDraftHorse = menu.AddItem("On draft horse", travel, () => { Travel(Mount.DraftHorse);});
+            Menu.MenuItem travelOnWarHorse = menu.AddItem("On war horse", travel, () => { Travel(Mount.WarHorse); });
+            Menu.MenuItem travelOnMule = menu.AddItem("On on mule", travel, () => { Travel(Mount.Mule); });
+            Menu.MenuItem travelOnMastiff = menu.AddItem("On mastiff", travel, () => { Travel(Mount.Mastiff); });
+            Menu.MenuItem camp = menu.AddItem("Camp", null, null);
+            Menu.MenuItem findCamp = menu.AddItem("Find Campsite", camp, null);
+            Menu.MenuItem encounters = menu.AddItem("Encounters", null, null);
+            Menu.MenuItem areaGenerators = menu.AddItem("Area Genrator", null, null);
+            Menu.MenuItem lootTables = menu.AddItem("Quest Generator", null, () => { GenerateQuest();});
+            Menu.MenuItem exit = menu.AddItem("Exit", null, () => { menu.Stop();});
             menu.Start();
             Console.Clear();
         }
@@ -206,7 +205,6 @@
 
         static void RollDice(Die die)
         {
-            //menu.Pause();
             Console.Clear();
             Console.WriteLine("Roll how many dice?");
             string? input = Console.ReadLine();
@@ -230,7 +228,6 @@
             Console.WriteLine();
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
-            //menu.Resume();
         }
 
         static int RollDie(Die die, int advantage = 0)
@@ -249,61 +246,64 @@
             //menu.Pause();
             Console.Clear();
             Console.WriteLine("Enter travel distance in miles:");
-            int distance;
+            decimal distance;
             string? distanceString = Console.ReadLine();
-            if (distanceString != null && int.TryParse(distanceString, out int totalDistance))
+            if (distanceString != null && decimal.TryParse(distanceString, out decimal totalDistance))
             {
                 
-                if (int.TryParse(distanceString, out distance))
+                if (decimal.TryParse(distanceString, out distance))
                 {
                     int populationDensity = 1;
                     Menu populationMenu = new Menu("Population Density");
-                    populationMenu.AddItem("Low", null, () => { populationMenu.Stop(); populationDensity = 1; return true; });
-                    populationMenu.AddItem("Medium", null, () => { populationMenu.Stop(); populationDensity = 2; return true; });
-                    populationMenu.AddItem("High", null, () => { populationMenu.Stop(); populationDensity = 3; return true; });
+                    populationMenu.AddItem("Low", null, () => { populationMenu.Stop(); populationDensity = 1; });
+                    populationMenu.AddItem("Medium", null, () => { populationMenu.Stop(); populationDensity = 2; });
+                    populationMenu.AddItem("High", null, () => { populationMenu.Stop(); populationDensity = 3; });
                     //object populationDensity = 
                     populationMenu.Start();
 
                     int season = 1;
                     Menu seasonMenu = new Menu("Season");
-                    seasonMenu.AddItem("Spring", null, () => { seasonMenu.Stop(); season = 1; return 1; });
-                    seasonMenu.AddItem("Summer", null, () => { seasonMenu.Stop(); season = 2; return 2; });
-                    seasonMenu.AddItem("Autumn", null, () => { seasonMenu.Stop(); season = 4; return 3; });
-                    seasonMenu.AddItem("Winter", null, () => { seasonMenu.Stop(); season = 4; return 4; });
+                    seasonMenu.AddItem("Spring", null, () => { seasonMenu.Stop(); season = 1; });
+                    seasonMenu.AddItem("Summer", null, () => { seasonMenu.Stop(); season = 2; });
+                    seasonMenu.AddItem("Autumn", null, () => { seasonMenu.Stop(); season = 4; });
+                    seasonMenu.AddItem("Winter", null, () => { seasonMenu.Stop(); season = 4; });
                     seasonMenu.Start();
 
                     string terrain = "";
                     Menu terrainMenu = new Menu("Terrain");
-                    terrainMenu.AddItem("Forrest", null, () => { terrainMenu.Stop(); terrain = "Forrest"; return "Forrest"; });
-                    terrainMenu.AddItem("Coastal", null, () => { terrainMenu.Stop(); terrain = "Coastal"; return "Coastal"; });
-                    terrainMenu.AddItem("Desert", null, () => { terrainMenu.Stop(); terrain = "Desert"; return "Desert"; });
-                    terrainMenu.AddItem("Grassland", null, () => { terrainMenu.Stop(); terrain = "Grassland";  return "Grassland"; });
-                    terrainMenu.AddItem("Hills", null, () => { terrainMenu.Stop(); terrain = "Hills"; return "Hills"; });
-                    terrainMenu.AddItem("Subterranean", null, () => { terrainMenu.Stop(); terrain = "Subterranean"; return "Subterranean"; });
-                    terrainMenu.AddItem("Swamp", null, () => { terrainMenu.Stop(); terrain = "Swamp"; return "Swamp"; });
-                    terrainMenu.AddItem("Mountain", null, () => { terrainMenu.Stop(); terrain = "Mountain"; return "Mountain"; });
+                    terrainMenu.AddItem("Forrest", null, () => { terrainMenu.Stop(); terrain = "Forrest"; });
+                    terrainMenu.AddItem("Coastal", null, () => { terrainMenu.Stop(); terrain = "Coastal"; });
+                    terrainMenu.AddItem("Desert", null, () => { terrainMenu.Stop(); terrain = "Desert"; });
+                    terrainMenu.AddItem("Grassland", null, () => { terrainMenu.Stop(); terrain = "Grassland"; });
+                    terrainMenu.AddItem("Hills", null, () => { terrainMenu.Stop(); terrain = "Hills"; });
+                    terrainMenu.AddItem("Subterranean", null, () => { terrainMenu.Stop(); terrain = "Subterranean"; });
+                    terrainMenu.AddItem("Swamp", null, () => { terrainMenu.Stop(); terrain = "Swamp"; });
+                    terrainMenu.AddItem("Mountain", null, () => { terrainMenu.Stop(); terrain = "Mountain"; });
                     terrainMenu.Start();
 
                     bool day = true;
                     Menu timeOfDayMenu = new Menu("Time of day");
-                    timeOfDayMenu.AddItem("Day", null, () => { timeOfDayMenu.Stop(); day = true; return true; });
-                    timeOfDayMenu.AddItem("Night", null, () => { timeOfDayMenu.Stop(); day = false; return false; });
+                    timeOfDayMenu.AddItem("Day", null, () => { timeOfDayMenu.Stop(); day = true; });
+                    timeOfDayMenu.AddItem("Night", null, () => { timeOfDayMenu.Stop(); day = false; });
                     timeOfDayMenu.Start();
 
                     bool difficultTerrain = false;
                     Menu terrainDifficultyMenu = new Menu("Difficult Terrain?");
-                    terrainDifficultyMenu.AddItem("Yes", null, () => { terrainDifficultyMenu.Stop(); difficultTerrain = true; return true; });
-                    terrainDifficultyMenu.AddItem("No", null, () => { terrainDifficultyMenu.Stop(); difficultTerrain = false; return false; });
+                    terrainDifficultyMenu.AddItem("Yes", null, () => { terrainDifficultyMenu.Stop(); difficultTerrain = true; });
+                    terrainDifficultyMenu.AddItem("No", null, () => { terrainDifficultyMenu.Stop(); difficultTerrain = false; });
                     terrainDifficultyMenu.Start();
 
                     //Console.WriteLine("difficultTerrain = " + difficultTerrain);
-                    int movementSpeed = (int)mount / 2;
+                    decimal movementSpeed = ((decimal)mount) / 2;
                     if (difficultTerrain)
                     {
-                        movementSpeed = (int)mount / 4;
+                        movementSpeed = ((decimal)mount) / 4;
                     }
-                    float travelTimeHours = (float)(totalDistance / movementSpeed * 24);
+                    decimal travelTimeDecimal = (totalDistance / (movementSpeed / 24));
+                    int travelTimeHours = (int)decimal.Truncate(travelTimeDecimal);
+                    int travelTimeMinutes = (int)decimal.Truncate((travelTimeDecimal - travelTimeHours)*60);
 
+                    TimeSpan travelTimeSpan = new TimeSpan(travelTimeHours, travelTimeMinutes, 0);
                     int weatherRoll = RollDie(Die.D20);
                     string weather = "";
                     switch (season)
@@ -425,31 +425,31 @@
                         case 1:
                             if (day)
                             {
-                                encounters = (int)Math.Ceiling(1 * (travelTimeHours / 12));
+                                encounters = (int)Math.Ceiling(1 * (travelTimeDecimal / 12));
                             }
                             else
                             {
-                                encounters = (int)Math.Ceiling(1 * (travelTimeHours / 12));
+                                encounters = (int)Math.Ceiling(1 * (travelTimeDecimal / 12));
                             }
                             break;
                         case 2:
                             if ((bool)day)
                             {
-                                encounters = (int)Math.Ceiling(4 * (travelTimeHours / 12));
+                                encounters = (int)Math.Ceiling(4 * (travelTimeDecimal / 12));
                             }
                             else
                             {
-                                encounters = (int)Math.Ceiling(2 * (travelTimeHours / 12));
+                                encounters = (int)Math.Ceiling(2 * (travelTimeDecimal / 12));
                             }
                             break;
                         case 3:
                             if ((bool)day)
                             {
-                                encounters = (int)Math.Ceiling(6 * (travelTimeHours / 12));
+                                encounters = (int)Math.Ceiling(6 * (travelTimeDecimal / 12));
                             }
                             else
                             {
-                                encounters = (int)Math.Ceiling(3 * (travelTimeHours / 12));
+                                encounters = (int)Math.Ceiling(3 * (travelTimeDecimal / 12));
                             }
                             break;
                     }
@@ -457,7 +457,7 @@
                     Console.ResetColor();
                     Console.Clear();
                     Console.WriteLine("Distance to Travel: " + totalDistance);
-                    Console.WriteLine("Travel Time: "+ travelTimeHours + "Hours");
+                    Console.WriteLine("Travel Time: "+ travelTimeSpan.ToString(@"dd\.hh\:mm\:ss"));
                     Console.WriteLine("Season: " + season);
                     Console.WriteLine("Weather: " + weather);
                     Console.WriteLine("Encounters: " + encounters);

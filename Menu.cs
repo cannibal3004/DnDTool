@@ -13,10 +13,11 @@
         private Timer? DrawTimer;
         private Timer? KeyTimer;
         private long Count = 0;
-        private MenuItem CurrentDynamicMenu;
+        private MenuItem? CurrentDynamicMenu;
         private Dictionary<ConsoleKey, MenuItem> DynamicKeyMap;
 
         public MenuItem RootItem;
+
         public Menu(string title, int width = 32)
         {
             RootItem = new MenuItem("Root", null, this, null);
@@ -25,7 +26,9 @@
             BackItem.ParentMenu = this;
             RootItem = new MenuItem(title, null, this, null);
             Items.Add(RootItem);
+            DynamicKeyMap = new Dictionary<ConsoleKey, MenuItem>();
     }
+
         public void Print(string str, ConsoleColor foregroundColor = ConsoleColor.White, ConsoleColor backgroundColor = ConsoleColor.Black)
         {
             Console.ForegroundColor = foregroundColor;
@@ -41,6 +44,7 @@
             Console.WriteLine(str);
             Console.ResetColor();
         }
+
         private void TDraw(object? stateInfo)
         {
             Draw();
@@ -70,33 +74,43 @@
                         case 1:
                             DynamicKeyMap = new Dictionary<ConsoleKey, MenuItem>();
                             DynamicKeyMap.Add(ConsoleKey.D1, item);
+                            DynamicKeyMap.Add(ConsoleKey.NumPad1, item);
                             break;
                         case 2:
                             DynamicKeyMap.Add(ConsoleKey.D2, item);
+                            DynamicKeyMap.Add(ConsoleKey.NumPad2, item);
                             break;
                         case 3:
                             DynamicKeyMap.Add(ConsoleKey.D3, item);
+                            DynamicKeyMap.Add(ConsoleKey.NumPad3, item);
                             break;
                         case 4:
                             DynamicKeyMap.Add(ConsoleKey.D4, item);
+                            DynamicKeyMap.Add(ConsoleKey.NumPad4, item);
                             break;
                         case 5:
                             DynamicKeyMap.Add(ConsoleKey.D5, item);
+                            DynamicKeyMap.Add(ConsoleKey.NumPad5, item);
                             break;
                         case 6:
                             DynamicKeyMap.Add(ConsoleKey.D6, item);
+                            DynamicKeyMap.Add(ConsoleKey.NumPad6, item);
                             break;
                         case 7:
                             DynamicKeyMap.Add(ConsoleKey.D7, item);
+                            DynamicKeyMap.Add(ConsoleKey.NumPad7, item);
                             break;
                         case 8:
                             DynamicKeyMap.Add(ConsoleKey.D8, item);
+                            DynamicKeyMap.Add(ConsoleKey.NumPad8, item);
                             break;
                         case 9:
                             DynamicKeyMap.Add(ConsoleKey.D9, item);
+                            DynamicKeyMap.Add(ConsoleKey.NumPad9, item);
                             break;
                         case 10:
                             DynamicKeyMap.Add(ConsoleKey.D0, item);
+                            DynamicKeyMap.Add(ConsoleKey.NumPad0, item);
                             break;
                     }
                     Print("|", ConsoleColor.Black, ConsoleColor.Gray);
@@ -124,33 +138,43 @@
                             case 1:
                                 DynamicKeyMap = new Dictionary<ConsoleKey, MenuItem>();
                                 DynamicKeyMap.Add(ConsoleKey.D1, BackItem);
+                                DynamicKeyMap.Add(ConsoleKey.NumPad1, BackItem);
                                 break;
                             case 2:
                                 DynamicKeyMap.Add(ConsoleKey.D2, BackItem);
+                                DynamicKeyMap.Add(ConsoleKey.NumPad2, BackItem);
                                 break;
                             case 3:
                                 DynamicKeyMap.Add(ConsoleKey.D3, BackItem);
+                                DynamicKeyMap.Add(ConsoleKey.NumPad3, BackItem);
                                 break;
                             case 4:
                                 DynamicKeyMap.Add(ConsoleKey.D4, BackItem);
+                                DynamicKeyMap.Add(ConsoleKey.NumPad4, BackItem);
                                 break;
                             case 5:
                                 DynamicKeyMap.Add(ConsoleKey.D5, BackItem);
+                                DynamicKeyMap.Add(ConsoleKey.NumPad5, BackItem);
                                 break;
                             case 6:
                                 DynamicKeyMap.Add(ConsoleKey.D6, BackItem);
+                                DynamicKeyMap.Add(ConsoleKey.NumPad6, BackItem);
                                 break;
                             case 7:
                                 DynamicKeyMap.Add(ConsoleKey.D7, BackItem);
+                                DynamicKeyMap.Add(ConsoleKey.NumPad7, BackItem);
                                 break;
                             case 8:
                                 DynamicKeyMap.Add(ConsoleKey.D8, BackItem);
+                                DynamicKeyMap.Add(ConsoleKey.NumPad8, BackItem);
                                 break;
                             case 9:
                                 DynamicKeyMap.Add(ConsoleKey.D9, BackItem);
+                                DynamicKeyMap.Add(ConsoleKey.NumPad9, BackItem);
                                 break;
                             case 10:
                                 DynamicKeyMap.Add(ConsoleKey.D0, BackItem);
+                                DynamicKeyMap.Add(ConsoleKey.NumPad0, BackItem);
                                 break;
                         }
                     }
@@ -169,7 +193,7 @@
             }
         }
 
-        public object ExecuteSelected()
+        public void ExecuteSelected()
         {
             if (SelectedItem != null)
             {
@@ -185,13 +209,10 @@
                 else
                 {
                     this.Pause();
-                    object retVal = SelectedItem.Execute();
-                    ReturnValue = retVal;
+                    SelectedItem.Execute();
                     if (!this.IsExiting) this.Resume();
-                    return retVal;
                 }
             }
-            return false;
         }
 
         public void SelectItem(MenuItem item)
@@ -212,10 +233,10 @@
             Draw();
         }
 
-        public object SelectAndExecute(MenuItem item)
+        public void SelectAndExecute(MenuItem item)
         {
             SelectItem(item);
-            return ExecuteSelected();
+            ExecuteSelected();
         }
 
         public void Back()
@@ -315,7 +336,7 @@
             if (this.KeyTimer != null) this.KeyTimer.Change(0, 100);
         }
 
-        public MenuItem AddItem(string name, MenuItem? parent, Func<object>? callBack, ConsoleKey? shortcutKey = null)
+        public MenuItem AddItem(string name, MenuItem? parent, Action? callBack, ConsoleKey? shortcutKey = null)
         {
             MenuItem item = new MenuItem(name, parent == null ? RootItem : parent, this, callBack);
             if (parent != null)
@@ -342,6 +363,46 @@
         {
             Items.Remove(item);
             Count--;
+        }
+
+        internal class MenuItem
+        {
+            public Menu ParentMenu;
+            public string Name { get; set; }
+            public bool IsSubmenu { get; set; }
+            public MenuItem? PreviousItem;
+            public MenuItem? NextItem;
+            public MenuItem? Parent { get; set; }
+            public List<MenuItem> Children = new();
+            public bool Selected { get; set; }
+            public Action? CallBack;
+            public void Execute()
+            {
+                if (CallBack != null)
+                {
+                    CallBack();
+                }
+            }
+            public void AddChild(MenuItem child)
+            {
+                if (!this.IsSubmenu) this.IsSubmenu = true;
+                MenuItem newItem = child;
+                if (Children.Count > 0)
+                {
+                    newItem.PreviousItem = Children.Last();
+                    Children.Last().NextItem = newItem;
+                }
+                newItem.NextItem = null;
+                Children.Add(newItem);
+            }
+            public MenuItem(string name, MenuItem? parent, Menu menu, Action? callBack)
+            {
+                this.Name = name;
+                this.Parent = parent;
+                this.Selected = false;
+                this.CallBack = callBack;
+                this.ParentMenu = menu;
+            }
         }
     }
 }
