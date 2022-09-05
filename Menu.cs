@@ -15,11 +15,12 @@
         private long Count = 0;
         private MenuItem? CurrentDynamicMenu;
         private Dictionary<ConsoleKey, MenuItem> DynamicKeyMap;
-
+        private int Width;
         public MenuItem RootItem;
 
         public Menu(string title, int width = 32)
         {
+            Width = width;
             RootItem = new MenuItem("Root", null, this, null);
             BackItem = new MenuItem("Back", null, this, null);
             RootItem.ParentMenu = this;
@@ -27,6 +28,7 @@
             RootItem = new MenuItem(title, null, this, null);
             Items.Add(RootItem);
             DynamicKeyMap = new Dictionary<ConsoleKey, MenuItem>();
+
     }
 
         public void Print(string str, ConsoleColor foregroundColor = ConsoleColor.White, ConsoleColor backgroundColor = ConsoleColor.Black)
@@ -61,7 +63,12 @@
                 Console.Clear();
                 string paddedTitle = CurrentMenu.Name.PadLeft((32 - CurrentMenu.Name.Length) / 2 + CurrentMenu.Name.Length).PadRight(32);
                 PrintLine("|"+ paddedTitle + "|", ConsoleColor.Black, ConsoleColor.Gray);
-                PrintLine("|--------------------------------|", ConsoleColor.Black, ConsoleColor.Gray);
+                string seperator = "";
+                for (int i = 0; i < Width; i++)
+                {
+                    seperator += "-";
+                }
+                PrintLine("|"+seperator+"|", ConsoleColor.Black, ConsoleColor.Gray);
                 int menuIndex = 1;
                 foreach (MenuItem item in CurrentMenu.Children)
                 {
@@ -403,6 +410,16 @@
                 this.CallBack = callBack;
                 this.ParentMenu = menu;
             }
+        }
+
+        public bool Prompt(string title)
+        {
+            bool retVal = false;
+            Menu promptMenu = new Menu(title);
+            promptMenu.AddItem("Yes", null, () => { retVal = false; });
+            promptMenu.AddItem("No", null , () => { retVal = true; });
+            promptMenu.Start();
+            return retVal;
         }
     }
 }
