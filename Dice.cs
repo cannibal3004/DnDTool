@@ -14,33 +14,6 @@
         }
         private static Random rand = new Random();
 
-        public static void RollDice(Die die)
-        {
-            Console.Clear();
-            Console.WriteLine("Roll how many dice?");
-            string? input = Console.ReadLine();
-            if (input != null)
-            {
-                Console.Clear();
-                Console.WriteLine("Enter advantage: (blank for none)");
-                string? advantageStr = Console.ReadLine();
-                int.TryParse(advantageStr, out int advantage);
-                Console.Clear();
-                int qty;
-                if (int.TryParse(input, out qty))
-                {
-                    for (int i = 0; i < qty; i++)
-                    {
-                        Console.Write("D" + (int)die + " " + (i + 1) + " : ");
-                        Console.WriteLine(RollDie(die, advantage));
-                    }
-                }
-            }
-            Console.WriteLine();
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
-        }
-
         public static int RollDie(Die die, int advantage = 0)
         {
             return rand.Next(1, (int)die) + advantage;

@@ -4,29 +4,23 @@
     {
         static void Main(string[] args)
         {
-            Menu menu = new Menu("DnD Tools");
+            Menu menu = new Menu("DnD Tools", Console.WindowWidth-2);
             Menu.MenuItem dice = menu.AddItem("Dice", null, null);
-            Menu.MenuItem d4 = menu.AddItem("Roll D4", dice, () => { Dice.RollDice(Dice.Die.D4); });
-            Menu.MenuItem d6 = menu.AddItem("Roll D6", dice, () => { Dice.RollDice(Dice.Die.D6); });
-            Menu.MenuItem d8 = menu.AddItem("Roll D8", dice, () => { Dice.RollDice(Dice.Die.D8); });
-            Menu.MenuItem d10 = menu.AddItem("Roll D10", dice, () => { Dice.RollDice(Dice.Die.D10); });
-            Menu.MenuItem d12 = menu.AddItem("Roll D12", dice, () => { Dice.RollDice(Dice.Die.D12);});
-            Menu.MenuItem d20 = menu.AddItem("Roll D20", dice, () => { Dice.RollDice(Dice.Die.D20); });
-            Menu.MenuItem d100 = menu.AddItem("Roll D100", dice, () => { Dice.RollDice(Dice.Die.D100); });
-            Menu.MenuItem questions = menu.AddItem("Questions", null, () => { Question(); });
-            Menu.MenuItem travel = menu.AddItem("Travel", null, null);
-            Menu.MenuItem travelOnFoot = menu.AddItem("On Foot", travel, () => { Travel(Mount.Foot); });
-            Menu.MenuItem travelOnHorseBack = menu.AddItem("On horseback", travel, () => { Travel(Mount.Horse); });
-            Menu.MenuItem travelOnDraftHorse = menu.AddItem("On draft horse", travel, () => { Travel(Mount.DraftHorse);});
-            Menu.MenuItem travelOnWarHorse = menu.AddItem("On war horse", travel, () => { Travel(Mount.WarHorse); });
-            Menu.MenuItem travelOnMule = menu.AddItem("On on mule", travel, () => { Travel(Mount.Mule); });
-            Menu.MenuItem travelOnMastiff = menu.AddItem("On mastiff", travel, () => { Travel(Mount.Mastiff); });
+            Menu.MenuItem d4 = menu.AddItem("Roll D4", dice, () => { RollDice(Dice.Die.D4); });
+            Menu.MenuItem d6 = menu.AddItem("Roll D6", dice, () => { RollDice(Dice.Die.D6); });
+            Menu.MenuItem d8 = menu.AddItem("Roll D8", dice, () => { RollDice(Dice.Die.D8); });
+            Menu.MenuItem d10 = menu.AddItem("Roll D10", dice, () => { RollDice(Dice.Die.D10); });
+            Menu.MenuItem d12 = menu.AddItem("Roll D12", dice, () => { RollDice(Dice.Die.D12); });
+            Menu.MenuItem d20 = menu.AddItem("Roll D20", dice, () => { RollDice(Dice.Die.D20); });
+            Menu.MenuItem d100 = menu.AddItem("Roll D100", dice, () => { RollDice(Dice.Die.D100); });
+            Menu.MenuItem questions = menu.AddItem("Questions", null, () => { Question(menu); });
+            Menu.MenuItem travel = menu.AddItem("Travel", null, () => { Travel(menu); });
             Menu.MenuItem camp = menu.AddItem("Camp", null, null);
             Menu.MenuItem findCamp = menu.AddItem("Find Campsite", camp, null);
             Menu.MenuItem encounters = menu.AddItem("Encounters", null, null);
             Menu.MenuItem areaGenerators = menu.AddItem("Area Genrator", null, null);
-            Menu.MenuItem lootTables = menu.AddItem("Quest Generator", null, () => { GenerateQuest();});
-            Menu.MenuItem exit = menu.AddItem("Exit", null, () => { menu.Stop();});
+            Menu.MenuItem lootTables = menu.AddItem("Quest Generator", null, () => { GenerateQuest(); });
+            Menu.MenuItem exit = menu.AddItem("Exit", null, () => { menu.Stop(); });
             menu.Start();
             Console.Clear();
         }
@@ -42,19 +36,17 @@
             Console.ReadKey();
         }
 
-        static void Question()
-        {
-            Console.Clear();
-            Console.WriteLine("Enter a yes/no/maybe question, or just press enter:");
-            string? questionStr = Console.ReadLine();
+        static void Question(Menu menu)
+        {;
+            string questionStr = menu.Input("Enter question");
+            int dieRoll = Dice.RollDie(Dice.Die.D20);
             if (questionStr != null)
             {
                 Console.Clear();
                 Console.WriteLine(questionStr);
             }
-            Console.WriteLine("Enter likelihood modifier:");
-            int dieRoll = Dice.RollDie(Dice.Die.D20);
-            string? likelihoodString = Console.ReadLine();
+
+            string? likelihoodString = menu.Input("Likelihood modifier");
             int.TryParse(likelihoodString, out int likelihood);
             if (dieRoll+likelihood < 7)
             {
@@ -75,75 +67,75 @@
             return "";
         }
 
-        static void Travel(Mount mount)
+        static void Travel(Menu menu)
         {
-            //int populationDensity = 0;
-            //menu.Pause();
-            Console.Clear();
-            Console.WriteLine("Enter travel distance in miles:");
             decimal distance;
-            string? distanceString = Console.ReadLine();
+            string? distanceString = menu.Input("Travel Distance");
             if (distanceString != null && decimal.TryParse(distanceString, out decimal totalDistance))
             {
-                
+
                 if (decimal.TryParse(distanceString, out distance))
                 {
-                    int populationDensity = 1;
-                    Menu populationMenu = new Menu("Population Density");
-                    populationMenu.AddItem("Low", null, () => { populationMenu.Stop(); populationDensity = 1; });
-                    populationMenu.AddItem("Medium", null, () => { populationMenu.Stop(); populationDensity = 2; });
-                    populationMenu.AddItem("High", null, () => { populationMenu.Stop(); populationDensity = 3; });
-                    //object populationDensity = 
-                    populationMenu.Start();
+                    int travelMount = Menu.Prompt("Mount", new Dictionary<string, int>()
+                    {
+                        { "On foot", 24 },
+                        { "On horseback", 30 },
+                        { "On war horse", 60 },
+                        { "On on mule" ,40 },
+                        { "On mastiff" , 40 }
+                    });
 
-                    int season = 1;
-                    Menu seasonMenu = new Menu("Season");
-                    seasonMenu.AddItem("Spring", null, () => { seasonMenu.Stop(); season = 1; });
-                    seasonMenu.AddItem("Summer", null, () => { seasonMenu.Stop(); season = 2; });
-                    seasonMenu.AddItem("Autumn", null, () => { seasonMenu.Stop(); season = 4; });
-                    seasonMenu.AddItem("Winter", null, () => { seasonMenu.Stop(); season = 4; });
-                    seasonMenu.Start();
+                    string populationDensity =  Menu.Prompt("Population Density", new Dictionary<string, string>() {
+                        { "Low", "Low" },
+                        { "Medium", "Medium"},
+                        { "High", "High" }
+                    });
 
-                    string terrain = "";
-                    Menu terrainMenu = new Menu("Terrain");
-                    terrainMenu.AddItem("Forrest", null, () => { terrainMenu.Stop(); terrain = "Forrest"; });
-                    terrainMenu.AddItem("Coastal", null, () => { terrainMenu.Stop(); terrain = "Coastal"; });
-                    terrainMenu.AddItem("Desert", null, () => { terrainMenu.Stop(); terrain = "Desert"; });
-                    terrainMenu.AddItem("Grassland", null, () => { terrainMenu.Stop(); terrain = "Grassland"; });
-                    terrainMenu.AddItem("Hills", null, () => { terrainMenu.Stop(); terrain = "Hills"; });
-                    terrainMenu.AddItem("Subterranean", null, () => { terrainMenu.Stop(); terrain = "Subterranean"; });
-                    terrainMenu.AddItem("Swamp", null, () => { terrainMenu.Stop(); terrain = "Swamp"; });
-                    terrainMenu.AddItem("Mountain", null, () => { terrainMenu.Stop(); terrain = "Mountain"; });
-                    terrainMenu.Start();
+                    string season = Menu.Prompt("Season", new Dictionary<string, string>()
+                    {
+                        { "Spring", "Spring" },
+                        { "Summer", "Summer" },
+                        { "Autumn", "Autumn" },
+                        { "Winter", "Winter" }
+                    });
 
-                    bool day = true;
-                    Menu timeOfDayMenu = new Menu("Time of day");
-                    timeOfDayMenu.AddItem("Day", null, () => { timeOfDayMenu.Stop(); day = true; });
-                    timeOfDayMenu.AddItem("Night", null, () => { timeOfDayMenu.Stop(); day = false; });
-                    timeOfDayMenu.Start();
+                    string terrain = Menu.Prompt("Terrain", new Dictionary<string, string>()
+                    {
+                        { "Forrest", "Forrest" },
+                        { "Coastal", "Coastal" },
+                        { "Desert", "Desert" },
+                        { "Grassland", "Grassland" },
+                        { "Hills", "Hills" },
+                        { "Subterranean", "Subterranean" },
+                        { "Swamp", "Swamp" },
+                        { "Mountain", "Mountain" }
+                    });
 
-                    bool difficultTerrain = false;
-                    Menu terrainDifficultyMenu = new Menu("Difficult Terrain?");
-                    terrainDifficultyMenu.AddItem("Yes", null, () => { terrainDifficultyMenu.Stop(); difficultTerrain = true; });
-                    terrainDifficultyMenu.AddItem("No", null, () => { terrainDifficultyMenu.Stop(); difficultTerrain = false; });
-                    terrainDifficultyMenu.Start();
+                    bool day = Menu.Prompt("Time of day", new Dictionary<string, bool>() 
+                    {
+                        { "Day", true },
+                        { "Night", false }
+                    });
 
-                    //Console.WriteLine("difficultTerrain = " + difficultTerrain);
-                    decimal movementSpeed = ((decimal)mount) / 2;
+                    bool difficultTerrain = Menu.Prompt("Difficult Terrain");
+
+                    decimal movementSpeed = ((decimal)travelMount);
                     if (difficultTerrain)
                     {
-                        movementSpeed = ((decimal)mount) / 4;
+                        movementSpeed = ((decimal)travelMount) / 2;
                     }
-                    decimal travelTimeDecimal = (totalDistance / (movementSpeed / 24));
+                    decimal travelTimeDecimal = (totalDistance / movementSpeed)*24;
+                    int travelTimeDays = (int)decimal.Truncate(travelTimeDecimal/24);
                     int travelTimeHours = (int)decimal.Truncate(travelTimeDecimal);
-                    int travelTimeMinutes = (int)decimal.Truncate((travelTimeDecimal - travelTimeHours)*60);
+                    int travelTimeMinutes = (int)decimal.Truncate((travelTimeDecimal - travelTimeHours) * 60);
+                    int travelTimeSeconds = (int)decimal.Truncate((travelTimeDecimal - travelTimeHours) * 360);
 
-                    TimeSpan travelTimeSpan = new TimeSpan(travelTimeHours, travelTimeMinutes, 0);
+                    TimeSpan travelTimeSpan = new TimeSpan(travelTimeDays, travelTimeHours, travelTimeMinutes, travelTimeSeconds);
                     int weatherRoll = Dice.RollDie(Dice.Die.D20);
                     string weather = "";
                     switch (season)
                     {
-                        case 1:
+                        case "Spring":
                             //Spring
                             if (weatherRoll == 1)
                             {
@@ -171,7 +163,7 @@
                                 weather = "Hot";
                             }
                             break;
-                        case 2:
+                        case "Summer":
                             //Summer
                             if (weatherRoll == 1)
                             {
@@ -198,7 +190,7 @@
                                 weather = "Very Hot";
                             }
                             break;
-                        case 3:
+                        case "Autumn":
                             //Autumn
                             if (weatherRoll == 1)
                             {
@@ -225,8 +217,8 @@
                                 weather = "Hot";
                             }
                             break;
-                        case 4:
-                            //Autumn
+                        case "Winter":
+                            //Winter
                             if (weatherRoll == 1)
                             {
                                 weather = "Heavy snow";
@@ -257,7 +249,7 @@
                     int encounters = 0;
                     switch (populationDensity)
                     {
-                        case 1:
+                        case "Low":
                             if (day)
                             {
                                 encounters = (int)Math.Ceiling(1 * (travelTimeDecimal / 12));
@@ -267,7 +259,7 @@
                                 encounters = (int)Math.Ceiling(1 * (travelTimeDecimal / 12));
                             }
                             break;
-                        case 2:
+                        case "Medium":
                             if ((bool)day)
                             {
                                 encounters = (int)Math.Ceiling(4 * (travelTimeDecimal / 12));
@@ -277,7 +269,7 @@
                                 encounters = (int)Math.Ceiling(2 * (travelTimeDecimal / 12));
                             }
                             break;
-                        case 3:
+                        case "High":
                             if ((bool)day)
                             {
                                 encounters = (int)Math.Ceiling(6 * (travelTimeDecimal / 12));
@@ -302,6 +294,33 @@
                 }
             }
         }
+
+         static void RollDice(Dice.Die die)
+        {
+            Console.Clear();
+            Console.WriteLine("Roll how many dice?");
+            string? input = Console.ReadLine();
+            if (input != null)
+            {
+                Console.Clear();
+                Console.WriteLine("Enter advantage: (blank for none)");
+                string? advantageStr = Console.ReadLine();
+                int.TryParse(advantageStr, out int advantage);
+                Console.Clear();
+                int qty;
+                if (int.TryParse(input, out qty))
+                {
+                    for (int i = 0; i < qty; i++)
+                    {
+                        Console.Write("D" + (int)die + " " + (i + 1) + " : ");
+                        Console.WriteLine(Dice.RollDie(die, advantage));
+                    }
+                }
+            }
+            Console.WriteLine();
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
     }
 
 
@@ -314,13 +333,6 @@
         Mule = 40,
         Cart = 30,
         Mastiff = 40
-    }
-
-    internal enum Season {
-        Summer,
-        Autumn,
-        Winter,
-        Spring
     }
 
 }

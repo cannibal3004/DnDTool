@@ -8,7 +8,6 @@
         private MenuItem? SelectedItem;
         private bool Drawing = false;
         private bool Polling = false;
-        private object ReturnValue = true;
         private bool IsExiting { get; set; } = false;
         private Timer? DrawTimer;
         private Timer? KeyTimer;
@@ -31,7 +30,7 @@
 
     }
 
-        public void Print(string str, ConsoleColor foregroundColor = ConsoleColor.White, ConsoleColor backgroundColor = ConsoleColor.Black)
+        public static void Print(string str, ConsoleColor foregroundColor = ConsoleColor.White, ConsoleColor backgroundColor = ConsoleColor.Black)
         {
             Console.ForegroundColor = foregroundColor;
             Console.BackgroundColor = backgroundColor;
@@ -39,7 +38,7 @@
             Console.ResetColor();
         }
 
-        public void PrintLine(string str, ConsoleColor foregroundColor = ConsoleColor.White, ConsoleColor backgroundColor = ConsoleColor.Black)
+        public static void PrintLine(string str, ConsoleColor foregroundColor = ConsoleColor.White, ConsoleColor backgroundColor = ConsoleColor.Black)
         {
             Console.ForegroundColor = foregroundColor;
             Console.BackgroundColor = backgroundColor;
@@ -61,7 +60,8 @@
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Clear();
-                string paddedTitle = CurrentMenu.Name.PadLeft((32 - CurrentMenu.Name.Length) / 2 + CurrentMenu.Name.Length).PadRight(32);
+                Width = Console.WindowWidth-2;
+                string paddedTitle = CurrentMenu.Name.PadLeft((Width - CurrentMenu.Name.Length) / 2 + CurrentMenu.Name.Length).PadRight(Width);
                 PrintLine("|"+ paddedTitle + "|", ConsoleColor.Black, ConsoleColor.Gray);
                 string seperator = "";
                 for (int i = 0; i < Width; i++)
@@ -128,10 +128,10 @@
                     if (item.Selected)
                     {
                         this.SelectedItem = item;
-                        Print(" " + menuIndex + " " + item.Name.PadRight(32-menuIndex.ToString().Length-2), ConsoleColor.White, ConsoleColor.DarkGray);
+                        Print(" " + menuIndex + " " + item.Name.PadRight(Width-menuIndex.ToString().Length-2), ConsoleColor.White, ConsoleColor.DarkGray);
                     } else
                     {
-                        Print(" " + menuIndex + " " + item.Name.PadRight(32 - menuIndex.ToString().Length - 2));
+                        Print(" " + menuIndex + " " + item.Name.PadRight(Width - menuIndex.ToString().Length - 2));
                     }
                     PrintLine("|", ConsoleColor.Black, ConsoleColor.Gray);
                     menuIndex++;
@@ -188,14 +188,19 @@
                     Print("|", ConsoleColor.Black, ConsoleColor.Gray);
                     if (BackItem.Selected)
                     {
-                        Print(" " + menuIndex + " " + BackItem.Name.PadRight(32 - menuIndex.ToString().Length - 2), ConsoleColor.White, ConsoleColor.DarkGray);
+                        Print(" " + menuIndex + " " + BackItem.Name.PadRight(Width - menuIndex.ToString().Length - 2), ConsoleColor.White, ConsoleColor.DarkGray);
                     } else
                     {
-                        Print(" " + menuIndex + " " + BackItem.Name.PadRight(32 - menuIndex.ToString().Length - 2));
+                        Print(" " + menuIndex + " " + BackItem.Name.PadRight(Width - menuIndex.ToString().Length - 2));
                     }
                     PrintLine("|", ConsoleColor.Black, ConsoleColor.Gray);
                 }
-                PrintLine("|________________________________|", ConsoleColor.Black, ConsoleColor.Gray);
+                string bottomLine = "";
+                for (int i = 0; i < Width; i++)
+                {
+                    bottomLine += "_";
+                }
+                PrintLine("|"+bottomLine+"|", ConsoleColor.Black, ConsoleColor.Gray);
                 Drawing = false;
             }
         }
@@ -254,7 +259,7 @@
             SelectedItem = null;
         }
 
-        public void Up()
+        public void Previous()
         {
             if ( SelectedItem != null && SelectedItem.PreviousItem != null)
             {
@@ -262,7 +267,7 @@
             }
         }
 
-        public void Down()
+        public void Next()
         {
             if (SelectedItem != null && SelectedItem.NextItem != null)
             {
@@ -301,10 +306,10 @@
                         ExecuteSelected();
                         break;
                     case ConsoleKey.UpArrow:
-                        Up();
+                        Previous();
                         break;
                     case ConsoleKey.DownArrow:
-                        Down();
+                        Next();
                         break;
                     case ConsoleKey.Q:
                     case ConsoleKey.Escape:
@@ -343,6 +348,29 @@
             if (this.KeyTimer != null) this.KeyTimer.Change(0, 100);
         }
 
+        public void AddItem(MenuItem item)
+        {
+            if (item.Parent != null)
+            {
+                item.Parent.AddChild(item);
+            } else
+            {
+                RootItem.AddChild(item);
+            }
+            if (item.ShortcutKey != null)
+            {
+                if (DynamicKeyMap.ContainsKey((ConsoleKey)item.ShortcutKey))
+                {
+                    throw new InvalidOperationException("Cannot assign shortcut key, already in use.");
+                }
+                else
+                {
+                    DynamicKeyMap.Add((ConsoleKey)item.ShortcutKey, item);
+                }
+            }
+            Count++;
+        }
+
         public MenuItem AddItem(string name, MenuItem? parent, Action? callBack, ConsoleKey? shortcutKey = null)
         {
             MenuItem item = new MenuItem(name, parent == null ? RootItem : parent, this, callBack);
@@ -372,6 +400,95 @@
             Count--;
         }
 
+        public static bool Prompt(string title)
+        {
+            bool retVal = false;
+            Menu promptMenu = new Menu(title);
+            promptMenu.AddItem("Yes", null, () => { retVal = true; promptMenu.Stop(); });
+            promptMenu.AddItem("No", null, () => { retVal = false; promptMenu.Stop(); });
+            promptMenu.Start();
+            return retVal;
+        }
+
+        public static bool Prompt(string title, Dictionary<string, bool> items)
+        {
+            bool retVal = false;
+            Menu promptMenu = new Menu(title);
+            foreach (KeyValuePair<string, bool> item in items)
+            {
+                Type type = item.Value.GetType();
+                promptMenu.AddItem(item.Key, null, () => { retVal = item.Value; promptMenu.Stop(); });
+            }
+            promptMenu.Start();
+            return retVal;
+        }
+
+        public static string Prompt(string title, Dictionary<string, string> items)
+        {
+            string retVal = "";
+            Menu promptMenu = new Menu(title);
+            foreach (KeyValuePair<string, string> item in items)
+            {
+                Type type = item.Value.GetType();
+                promptMenu.AddItem(item.Key, null, () => { retVal = item.Value; promptMenu.Stop(); });
+            }
+            promptMenu.Start();
+            return retVal;
+        }
+
+        public static int Prompt(string title, Dictionary<string, int> items)
+        {
+            int retVal = -1;
+            Menu promptMenu = new Menu(title);
+            foreach (KeyValuePair<string, int> item in items)
+            {
+                Type type = item.Value.GetType();
+                promptMenu.AddItem(item.Key, null, () => { retVal = item.Value; promptMenu.Stop(); });
+            }
+            promptMenu.Start();
+            return retVal;
+        }
+
+        public static decimal Prompt(string title, Dictionary<string, decimal> items)
+        {
+            decimal retVal = -1;
+            Menu promptMenu = new Menu(title);
+            foreach (KeyValuePair<string, decimal> item in items)
+            {
+                Type type = item.Value.GetType();
+                promptMenu.AddItem(item.Key, null, () => { retVal = item.Value; promptMenu.Stop(); });
+            }
+            promptMenu.Start();
+            return retVal;
+        }
+
+        public string Input(string title)
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Clear();
+            Width = Console.WindowWidth - 2;
+            string paddedTitle = title.PadLeft((Width - title.Length) / 2 + title.Length).PadRight(Width);
+            PrintLine("|" + paddedTitle + "|", ConsoleColor.Black, ConsoleColor.Gray);
+            string inputLine = "";
+            string bottomLine = "";
+            for (int i = 0; i < Width; i++)
+            {
+                bottomLine += "_";
+                inputLine += " ";
+            }
+            Print("|", ConsoleColor.Black, ConsoleColor.Gray);
+            Print(inputLine);
+            PrintLine("|", ConsoleColor.Black, ConsoleColor.Gray);
+            PrintLine("|" + bottomLine + "|", ConsoleColor.Black, ConsoleColor.Gray);
+            Console.SetCursorPosition(2, 1);
+            string? input = Console.ReadLine();
+            if (input != null)
+            {
+                return input;
+            }
+            return "";
+        }
         internal class MenuItem
         {
             public Menu ParentMenu;
@@ -383,6 +500,7 @@
             public List<MenuItem> Children = new();
             public bool Selected { get; set; }
             public Action? CallBack;
+            public ConsoleKey? ShortcutKey { get; set; }
             public void Execute()
             {
                 if (CallBack != null)
@@ -410,16 +528,6 @@
                 this.CallBack = callBack;
                 this.ParentMenu = menu;
             }
-        }
-
-        public bool Prompt(string title)
-        {
-            bool retVal = false;
-            Menu promptMenu = new Menu(title);
-            promptMenu.AddItem("Yes", null, () => { retVal = false; });
-            promptMenu.AddItem("No", null , () => { retVal = true; });
-            promptMenu.Start();
-            return retVal;
         }
     }
 }
