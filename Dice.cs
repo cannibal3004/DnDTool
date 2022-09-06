@@ -16,7 +16,7 @@
 
         public static int RollDie(Die die, int advantage = 0)
         {
-            return rand.Next(1, (int)die) + advantage;
+            return rand.Next(1, (int)die+1) + advantage;
         }
     }
 }
