@@ -2,6 +2,47 @@
 {
     internal class Menu
     {
+        internal class MenuItem
+        {
+            public Menu ParentMenu;
+            public string Name { get; set; }
+            public bool IsSubmenu { get; set; }
+            public MenuItem? PreviousItem;
+            public MenuItem? NextItem;
+            public MenuItem? Parent { get; set; }
+            public List<MenuItem> Children = new();
+            public bool Selected { get; set; }
+            public Action? CallBack;
+            public ConsoleKey? ShortcutKey { get; set; }
+            public void Execute()
+            {
+                if (CallBack != null)
+                {
+                    CallBack();
+                }
+            }
+            public void AddChild(MenuItem child)
+            {
+                if (!this.IsSubmenu) this.IsSubmenu = true;
+                MenuItem newItem = child;
+                if (Children.Count > 0)
+                {
+                    newItem.PreviousItem = Children.Last();
+                    Children.Last().NextItem = newItem;
+                }
+                newItem.NextItem = null;
+                Children.Add(newItem);
+            }
+            public MenuItem(string name, MenuItem? parent, Menu menu, Action? callBack)
+            {
+                this.Name = name;
+                this.Parent = parent;
+                this.Selected = false;
+                this.CallBack = callBack;
+                this.ParentMenu = menu;
+            }
+        }
+
         private List<MenuItem> Items = new List<MenuItem>();
         private MenuItem BackItem;
         private MenuItem? CurrentMenu;
@@ -468,7 +509,8 @@
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Clear();
             Width = Console.WindowWidth - 2;
-            string paddedTitle = title.PadLeft((Width - title.Length) / 2 + title.Length).PadRight(Width);
+            //string paddedTitle = title.PadLeft((Width - title.Length) / 2 + title.Length).PadRight(Width);
+            string paddedTitle = title.PadLeft(title.Length + 1).PadRight(Width);
             PrintLine("|" + paddedTitle + "|", ConsoleColor.Black, ConsoleColor.Gray);
             string inputLine = "";
             string bottomLine = "";
@@ -506,22 +548,21 @@
                 inputLine += " ";
             }
             Print("|", ConsoleColor.Black, ConsoleColor.Gray);
-            Print(inputLine);
+            Print(message.PadLeft(message.Length+2).PadRight(Width));
             PrintLine("|", ConsoleColor.Black, ConsoleColor.Gray);
             PrintLine("|" + bottomLine + "|", ConsoleColor.Black, ConsoleColor.Gray);
-            Console.SetCursorPosition(2, 1);
-            Print(message);
+            Console.SetCursorPosition(0, 3);
             Console.ReadKey(false);
         }
+
         public void Message(string title, string[] message)
         {
             Console.ForegroundColor = ConsoleColor.White;
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Clear();
             Width = Console.WindowWidth - 2;
-            string paddedTitle = title.PadLeft((Width - title.Length) / 2 + title.Length).PadRight(Width);
+            string paddedTitle = title.PadLeft((Width - title.Length -2 ) / 2 + title.Length).PadRight(Width);
             PrintLine("|" + paddedTitle + "|", ConsoleColor.Black, ConsoleColor.Gray);
-            string inputLine = " ";
             string bottomLine = "";
             for (int i = 0; i < Width; i++)
             {
@@ -531,56 +572,16 @@
             for (int i = 0; i < message.Length; i++)
             {
                 Print("|", ConsoleColor.Black, ConsoleColor.Gray);
-                Print(inputLine);
+                //Print(inputLine);
+                //PrintLine("|", ConsoleColor.Black, ConsoleColor.Gray);
+                Console.SetCursorPosition(2, 1 + i);
+                Print(message[i].PadLeft((message[i].Length+2)).PadRight(Width-1));
                 PrintLine("|", ConsoleColor.Black, ConsoleColor.Gray);
-                Console.SetCursorPosition(2, 1+i);
-                Print(message[i].PadLeft((Width-1 - message[i].Length) / 2 + message[i].Length).PadRight(Width-1));
-                PrintLine("|", ConsoleColor.Black, ConsoleColor.Gray);
-                Console.SetCursorPosition(0, 2+i);
+                Console.SetCursorPosition(0, 2 + i);
             }
             Console.SetCursorPosition(0, message.Length + 1);
             PrintLine("|" + bottomLine + "|", ConsoleColor.Black, ConsoleColor.Gray);
             Console.ReadKey();
-        }
-        internal class MenuItem
-        {
-            public Menu ParentMenu;
-            public string Name { get; set; }
-            public bool IsSubmenu { get; set; }
-            public MenuItem? PreviousItem;
-            public MenuItem? NextItem;
-            public MenuItem? Parent { get; set; }
-            public List<MenuItem> Children = new();
-            public bool Selected { get; set; }
-            public Action? CallBack;
-            public ConsoleKey? ShortcutKey { get; set; }
-            public void Execute()
-            {
-                if (CallBack != null)
-                {
-                    CallBack();
-                }
-            }
-            public void AddChild(MenuItem child)
-            {
-                if (!this.IsSubmenu) this.IsSubmenu = true;
-                MenuItem newItem = child;
-                if (Children.Count > 0)
-                {
-                    newItem.PreviousItem = Children.Last();
-                    Children.Last().NextItem = newItem;
-                }
-                newItem.NextItem = null;
-                Children.Add(newItem);
-            }
-            public MenuItem(string name, MenuItem? parent, Menu menu, Action? callBack)
-            {
-                this.Name = name;
-                this.Parent = parent;
-                this.Selected = false;
-                this.CallBack = callBack;
-                this.ParentMenu = menu;
-            }
         }
     }
 }
