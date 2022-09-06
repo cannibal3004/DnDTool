@@ -489,6 +489,59 @@
             }
             return "";
         }
+
+        public void Message(string title, string message)
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Clear();
+            Width = Console.WindowWidth - 2;
+            string paddedTitle = title.PadLeft((Width - title.Length) / 2 + title.Length).PadRight(Width);
+            PrintLine("|" + paddedTitle + "|", ConsoleColor.Black, ConsoleColor.Gray);
+            string inputLine = "";
+            string bottomLine = "";
+            for (int i = 0; i < Width; i++)
+            {
+                bottomLine += "_";
+                inputLine += " ";
+            }
+            Print("|", ConsoleColor.Black, ConsoleColor.Gray);
+            Print(inputLine);
+            PrintLine("|", ConsoleColor.Black, ConsoleColor.Gray);
+            PrintLine("|" + bottomLine + "|", ConsoleColor.Black, ConsoleColor.Gray);
+            Console.SetCursorPosition(2, 1);
+            Print(message);
+            Console.ReadKey(false);
+        }
+        public void Message(string title, string[] message)
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Clear();
+            Width = Console.WindowWidth - 2;
+            string paddedTitle = title.PadLeft((Width - title.Length) / 2 + title.Length).PadRight(Width);
+            PrintLine("|" + paddedTitle + "|", ConsoleColor.Black, ConsoleColor.Gray);
+            string inputLine = " ";
+            string bottomLine = "";
+            for (int i = 0; i < Width; i++)
+            {
+                bottomLine += "_";
+                //inputLine += " ";
+            }
+            for (int i = 0; i < message.Length; i++)
+            {
+                Print("|", ConsoleColor.Black, ConsoleColor.Gray);
+                Print(inputLine);
+                PrintLine("|", ConsoleColor.Black, ConsoleColor.Gray);
+                Console.SetCursorPosition(2, 1+i);
+                Print(message[i].PadLeft((Width-1 - message[i].Length) / 2 + message[i].Length).PadRight(Width-1));
+                PrintLine("|", ConsoleColor.Black, ConsoleColor.Gray);
+                Console.SetCursorPosition(0, 2+i);
+            }
+            Console.SetCursorPosition(0, message.Length + 1);
+            PrintLine("|" + bottomLine + "|", ConsoleColor.Black, ConsoleColor.Gray);
+            Console.ReadKey();
+        }
         internal class MenuItem
         {
             public Menu ParentMenu;

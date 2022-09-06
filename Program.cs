@@ -6,13 +6,13 @@
         {
             Menu menu = new Menu("DnD Tools", Console.WindowWidth-2);
             Menu.MenuItem dice = menu.AddItem("Dice", null, null);
-            Menu.MenuItem d4 = menu.AddItem("Roll D4", dice, () => { RollDice(Dice.Die.D4); });
-            Menu.MenuItem d6 = menu.AddItem("Roll D6", dice, () => { RollDice(Dice.Die.D6); });
-            Menu.MenuItem d8 = menu.AddItem("Roll D8", dice, () => { RollDice(Dice.Die.D8); });
-            Menu.MenuItem d10 = menu.AddItem("Roll D10", dice, () => { RollDice(Dice.Die.D10); });
-            Menu.MenuItem d12 = menu.AddItem("Roll D12", dice, () => { RollDice(Dice.Die.D12); });
-            Menu.MenuItem d20 = menu.AddItem("Roll D20", dice, () => { RollDice(Dice.Die.D20); });
-            Menu.MenuItem d100 = menu.AddItem("Roll D100", dice, () => { RollDice(Dice.Die.D100); });
+            Menu.MenuItem d4 = menu.AddItem("Roll D4", dice, () => { RollDice(Dice.Die.D4, menu); });
+            Menu.MenuItem d6 = menu.AddItem("Roll D6", dice, () => { RollDice(Dice.Die.D6, menu); });
+            Menu.MenuItem d8 = menu.AddItem("Roll D8", dice, () => { RollDice(Dice.Die.D8, menu); });
+            Menu.MenuItem d10 = menu.AddItem("Roll D10", dice, () => { RollDice(Dice.Die.D10, menu); });
+            Menu.MenuItem d12 = menu.AddItem("Roll D12", dice, () => { RollDice(Dice.Die.D12, menu); });
+            Menu.MenuItem d20 = menu.AddItem("Roll D20", dice, () => { RollDice(Dice.Die.D20, menu); });
+            Menu.MenuItem d100 = menu.AddItem("Roll D100", dice, () => { RollDice(Dice.Die.D100, menu); });
             Menu.MenuItem questions = menu.AddItem("Questions", null, () => { Question(menu); });
             Menu.MenuItem travel = menu.AddItem("Travel", null, () => { Travel(menu); });
             Menu.MenuItem camp = menu.AddItem("Camp", null, null);
@@ -50,16 +50,14 @@
             int.TryParse(likelihoodString, out int likelihood);
             if (dieRoll+likelihood < 7)
             {
-                Console.WriteLine(dieRoll + likelihood + " No");
+                menu.Message("Answer", (dieRoll + likelihood) + " No");
             } else if (dieRoll+likelihood > 6 && dieRoll+likelihood < 13)
             {
-                Console.WriteLine(dieRoll+likelihood+" Maybe");
+                menu.Message("Answer", (dieRoll + likelihood) + " Maybe");
             } else
             {
-                Console.WriteLine(dieRoll + likelihood + " Yes");
+                menu.Message("Answer", (dieRoll + likelihood) + " Yes");
             }
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
         }
 
         static string GenerateTavern()
@@ -295,31 +293,31 @@
             }
         }
 
-         static void RollDice(Dice.Die die)
+        static void RollDice(Dice.Die die, Menu menu)
         {
-            Console.Clear();
-            Console.WriteLine("Roll how many dice?");
-            string? input = Console.ReadLine();
+            //Console.Clear();
+            //Console.WriteLine("Roll how many dice?");
+            string input = menu.Input("How many dice?");
             if (input != null)
             {
-                Console.Clear();
-                Console.WriteLine("Enter advantage: (blank for none)");
-                string? advantageStr = Console.ReadLine();
+                //Console.Clear();
+                //Console.WriteLine("Enter advantage: (blank for none)");
+                string advantageStr = menu.Input("Advantage");
                 int.TryParse(advantageStr, out int advantage);
-                Console.Clear();
-                int qty;
-                if (int.TryParse(input, out qty))
+
+                if (int.TryParse(input, out int qty))
                 {
+                    List<string> messageLines = new();
                     for (int i = 0; i < qty; i++)
                     {
-                        Console.Write("D" + (int)die + " " + (i + 1) + " : ");
-                        Console.WriteLine(Dice.RollDie(die, advantage));
+                        //Console.Write("D" + (int)die + " " + (i + 1) + " : ");
+                        //Console.WriteLine(Dice.RollDie(die, advantage));
+                        int roll = Dice.RollDie(die, advantage);
+                        messageLines.Add(("D" + (int)die).PadLeft(2) + (" #" + (i + 1) + ": ").PadLeft(6) + roll.ToString().PadRight(4) + ((int)die == roll ? "*" : ""));
                     }
+                    menu.Message("Rolls",messageLines.ToArray());
                 }
             }
-            Console.WriteLine();
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
         }
     }
 
