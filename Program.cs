@@ -19,21 +19,17 @@
             Menu.MenuItem findCamp = menu.AddItem("Find Campsite", camp, null);
             Menu.MenuItem encounters = menu.AddItem("Encounters", null, null);
             Menu.MenuItem areaGenerators = menu.AddItem("Area Genrator", null, null);
-            Menu.MenuItem lootTables = menu.AddItem("Quest Generator", null, () => { GenerateQuest(); });
+            Menu.MenuItem tavernGenerators = menu.AddItem("Tavern Generator", null, () => { GenerateTavern(menu); });
+            Menu.MenuItem lootTables = menu.AddItem("Quest Generator", null, () => { GenerateQuest(menu); });
             Menu.MenuItem exit = menu.AddItem("Exit", null, () => { menu.Stop(); });
             menu.Start();
             Console.Clear();
         }
 
-        static void GenerateQuest()
+        static void GenerateQuest(Menu menu)
         {
             Quest quest = Quest.Generate();
-            Console.ResetColor();
-            Console.Clear();
-            Console.WriteLine(quest.ToString());
-            Console.WriteLine();
-            Console.WriteLine("Press any key to continue.");
-            Console.ReadKey();
+            menu.Message("Quest", quest.ToString().Split("\n"));
         }
 
         static void Question(Menu menu)
@@ -60,9 +56,76 @@
             }
         }
 
-        static string GenerateTavern()
+        static class TavernNameGenerator
         {
-            return "";
+            internal enum TavernQuality
+            {
+                Attrocious,
+                Poor,
+                Average,
+                Good,
+                Excellent,
+                Outstanding
+            }
+            public struct Tavern
+            {
+                public string Name;
+                public int Rooms;
+                public int Rumors;
+                public TavernQuality Quality;
+            }
+            private static string[] FirstPart = { 
+                "The Guilded",
+                "The Frog and",
+                "The Hammer and",
+                "The Golden",
+                "The Black",
+                "Eye of the",
+                "The Sword and",
+                "The Filthy",
+                "The Evil",
+                "The Good",
+                "The Stroppy",
+                "The Greasy",
+                "The Naughty",
+                "The Queen and",
+                "The Leper and",
+                "The Dog and",
+                "The Sweaty",
+                "The Blessed",
+                "The Cunning",
+                "The Knight's"
+            };
+            private static string[] LastPart = { 
+                "Anvil",
+                "Eye",
+                "Rogue",
+                "Assassin",
+                "Dagger",
+                "Spadger",
+                "Quipper",
+                "King",
+                "Wizard",
+                "Toad",
+                "Bullock",
+                "Bollock",
+                "Buttock",
+                "Cuckold",
+                "Sabre",
+                "Strumpet",
+                "Nonce",
+                "Scoundrel",
+                "Knave",
+                "Cock"
+            };
+            public static string GenerateTavernName()
+            {
+                return FirstPart[Dice.RollDie(Dice.Die.D20-1)] + " " + LastPart[Dice.RollDie(Dice.Die.D20)-1];
+            }
+        }
+        static void GenerateTavern(Menu menu)
+        {
+            menu.Message("Tavern",TavernNameGenerator.GenerateTavernName());
         }
 
         static void Travel(Menu menu)
