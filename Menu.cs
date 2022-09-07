@@ -542,11 +542,14 @@
             PrintLine("|" + paddedTitle + "|", ConsoleColor.Black, ConsoleColor.Gray);
             string inputLine = "";
             string bottomLine = "";
+            string seperator = "";
             for (int i = 0; i < Width; i++)
             {
                 bottomLine += "_";
                 inputLine += " ";
+                seperator += "-";
             }
+            PrintLine("|" + seperator + "|", ConsoleColor.Black, ConsoleColor.Gray);
             Print("|", ConsoleColor.Black, ConsoleColor.Gray);
             Print(message.PadLeft(message.Length+2).PadRight(Width));
             PrintLine("|", ConsoleColor.Black, ConsoleColor.Gray);
@@ -564,22 +567,25 @@
             string paddedTitle = title.PadLeft((Width - title.Length -2 ) / 2 + title.Length).PadRight(Width);
             PrintLine("|" + paddedTitle + "|", ConsoleColor.Black, ConsoleColor.Gray);
             string bottomLine = "";
+            string seperator = "";
             for (int i = 0; i < Width; i++)
             {
                 bottomLine += "_";
+                seperator += "-";
                 //inputLine += " ";
             }
+            PrintLine("|" + seperator.PadLeft(Width) + "|", ConsoleColor.Black, ConsoleColor.Gray);
             for (int i = 0; i < message.Length; i++)
             {
                 Print("|", ConsoleColor.Black, ConsoleColor.Gray);
                 //Print(inputLine);
                 //PrintLine("|", ConsoleColor.Black, ConsoleColor.Gray);
-                Console.SetCursorPosition(2, 1 + i);
+                Console.SetCursorPosition(2, 2 + i);
                 Print(message[i].PadLeft((message[i].Length+2)).PadRight(Width-1));
                 PrintLine("|", ConsoleColor.Black, ConsoleColor.Gray);
-                Console.SetCursorPosition(0, 2 + i);
+                Console.SetCursorPosition(0, 3 + i);
             }
-            Console.SetCursorPosition(0, message.Length + 1);
+            Console.SetCursorPosition(0, message.Length + 2);
             PrintLine("|" + bottomLine + "|", ConsoleColor.Black, ConsoleColor.Gray);
             Console.ReadKey();
         }
