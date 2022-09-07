@@ -19,21 +19,17 @@
             Menu.MenuItem findCamp = menu.AddItem("Find Campsite", camp, null);
             Menu.MenuItem encounters = menu.AddItem("Encounters", null, null);
             Menu.MenuItem areaGenerators = menu.AddItem("Area Genrator", null, null);
-            Menu.MenuItem lootTables = menu.AddItem("Quest Generator", null, () => { GenerateQuest(); });
+            Menu.MenuItem tavernGenerators = menu.AddItem("Tavern Generator", null, () => { GenerateTavern(menu); });
+            Menu.MenuItem lootTables = menu.AddItem("Quest Generator", null, () => { GenerateQuest(menu); });
             Menu.MenuItem exit = menu.AddItem("Exit", null, () => { menu.Stop(); });
             menu.Start();
             Console.Clear();
         }
 
-        static void GenerateQuest()
+        static void GenerateQuest(Menu menu)
         {
             Quest quest = Quest.Generate();
-            Console.ResetColor();
-            Console.Clear();
-            Console.WriteLine(quest.ToString());
-            Console.WriteLine();
-            Console.WriteLine("Press any key to continue.");
-            Console.ReadKey();
+            menu.Message("Quest", quest.ToString().Split("\n"));
         }
 
         static void Question(Menu menu)
@@ -60,9 +56,229 @@
             }
         }
 
-        static string GenerateTavern()
+        static class TavernGenerator
         {
-            return "";
+            internal enum TavernQuality
+            {
+                Atrocious,
+                Poor,
+                Average,
+                Good,
+                Excellent,
+                Outstanding
+            }
+            //public struct Tavern
+            //{
+            //    public string Name { get; set; }
+            //    public int Rooms { get; set; }
+            //    public int Rumors { get; set; }
+            //    public TavernQuality Quality { get; set; }
+            //}
+            private static string[] FirstPart = { 
+                "The Guilded",
+                "The Frog and",
+                "The Hammer and",
+                "The Golden",
+                "The Black",
+                "Eye of the",
+                "The Sword and",
+                "The Filthy",
+                "The Evil",
+                "The Good",
+                "The Stroppy",
+                "The Greasy",
+                "The Naughty",
+                "The Queen and",
+                "The Leper and",
+                "The Dog and",
+                "The Sweaty",
+                "The Blessed",
+                "The Cunning",
+                "The Knight's"
+            };
+            private static string[] LastPart = { 
+                "Anvil",
+                "Eye",
+                "Rogue",
+                "Assassin",
+                "Dagger",
+                "Spadger",
+                "Quipper",
+                "King",
+                "Wizard",
+                "Toad",
+                "Bullock",
+                "Bollock",
+                "Buttock",
+                "Cuckold",
+                "Sabre",
+                "Strumpet",
+                "Nonce",
+                "Scoundrel",
+                "Knave",
+                "Cock"
+            };
+            public static string GenerateTavernName()
+            {
+                return FirstPart[Dice.RollDie(Dice.Die.D20-1)] + " " + LastPart[Dice.RollDie(Dice.Die.D20)-1];
+            }
+        }
+        static void GenerateTavern(Menu menu)
+        {
+            //menu.Message("Tavern",TavernNameGenerator.GenerateTavernName());
+            string tavernName = TavernGenerator.GenerateTavernName();
+            int roomRoll = Dice.RollDie(Dice.Die.D10);
+            int rooms = 0; ;
+            switch (roomRoll){
+                case 1:
+                    rooms = 0;
+                    break;
+                case 2:
+                    rooms = 1;
+                    break;
+                case 3:
+                    rooms = 2;
+                    break;
+                case 4:
+                    rooms = 3;
+                    break;
+                case 5:
+                    rooms = 4;
+                    break;
+                case 6:
+                    rooms = 5;
+                    break;
+                case 7:
+                    rooms = 6;
+                    break;
+                case 8:
+                    rooms = 7;
+                    break;
+                case 9:
+                    rooms = 8;
+                    break;
+                case 10:
+                    rooms = 9;
+                    break;
+            }
+            int qualityRoll = Dice.RollDie(Dice.Die.D10);
+            string quality = "";
+            switch (qualityRoll) { 
+                case 1:
+                    quality = "Atrocious";
+                    break;
+                case 2:
+                case 3:
+                    quality = "Poor";
+                    break;
+                case 4:
+                case 5:
+                case 6:
+                    quality = "Average";
+                    break;
+                case 7:
+                case 8:
+                    quality = "Good";
+                    break;
+                case 9:
+                    quality = "Excellent";
+                    break;
+                case 10:
+                    quality = "Outstanding";
+                    break;
+            }
+            int inkeepRoll = Dice.RollDie(Dice.Die.D10);
+            string inkeep = "";
+            switch (inkeepRoll) {
+                case 1:
+                    inkeep = "Male gnome";
+                    break;
+                case 2:
+                    inkeep = "Female halfling";
+                    break;
+                case 3:
+                    inkeep = "Male dwarf";
+                    break;
+                case 4:
+                    inkeep = "Tiefling";
+                    break;
+                case 5:
+                    inkeep = "Human male";
+                    break;
+                case 6:
+                    inkeep = "Human female";
+                    break;
+                case 7:
+                    inkeep = "Male halfling";
+                    break;
+                case 8:
+                    inkeep = "Female gnome";
+                    break;
+                case 9:
+                    inkeep = "Orc or Half-Orc";
+                    break;
+                case 10:
+                    inkeep = "Player's Choice";
+                    break;
+            }
+            int rumorsRoll = Dice.RollDie(Dice.Die.D10);
+            int rumors = 0;
+            switch (rumorsRoll) {
+                case 1:
+                    rumors = 0;
+                    break;
+                case 2:
+                case 3:
+                    rumors = 1;
+                    break;
+                case 4:
+                case 5:
+                case 6:
+                    rumors = 2;
+                    break;
+                case 7:
+                case 8:
+                    rumors = 3;
+                    break;
+                case 9:
+                case 10:
+                    rumors = 4;
+                    break;
+            }
+            int customerServiceRoll = Dice.RollDie(Dice.Die.D10);
+            string customerService = ""; ;
+            switch (customerServiceRoll) {
+                case 1:
+                    customerService = "Unfriendly";
+                    break;
+                case 2:
+                case 3:
+                    customerService = "Neutral";
+                    break;
+                case 4:
+                case 5:
+                    customerService = "Civil";
+                    break;
+                case 6:
+                case 7:
+                    customerService = "Cordial";
+                    break;
+                case 8:
+                case 9:
+                    customerService = "Warm & Welcoming";
+                    break;
+                case 10:
+                    customerService = "Treated like a monarch!";
+                    break;
+            }
+            string[] messageText = {
+                "Name: " + tavernName,
+                "Quality: " + quality,
+                "Rumors: " + rumors,
+                "Innkeep: " + inkeep,
+                "Customer service: " + customerService
+            };
+            menu.Message("Tavern", messageText);
         }
 
         static void Travel(Menu menu)
