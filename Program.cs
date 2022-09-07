@@ -272,6 +272,7 @@
                     break;
             }
             string[] messageText = {
+                "Rolls: " + roomRoll + " " + qualityRoll + " " + inkeepRoll + " " + rumorsRoll + " " + customerServiceRoll,
                 "Name: " + tavernName,
                 "Quality: " + quality,
                 "Rumors: " + rumors,
